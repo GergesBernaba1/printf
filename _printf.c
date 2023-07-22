@@ -1,50 +1,47 @@
-#include "holberton.h"
+include "holberton.h"
+#include <stddef.h>
+#include <stdio.h>
+
 
 /**
- * _printf - prints formatted data to stdout
- * @format: string that contains the format to print
- * Return: number of characters written
+ * _printf - function that prints output
+ * @format: is a charachter string with 0 to 3 directives
+ * Return: the number of charachters to be printed
  */
-int _printf(char *format, ...)
-{
-	int written = 0, (*structype)(char *, va_list);
-	char q[3];
-	va_list pa;
 
-	if (format == NULL)
+int _printf(const char *format, ...)
+{
+	va_list valist;
+	int i, buffend = 0;
+	double totalBuffer = 0;
+	double *total;
+	char *holder;
+	char buffer[BUFSIZE];
+	char *(*spec_func)(va_list) = NULL;
+
+	if (!format)
 		return (-1);
-	q[2] = '\0';
-	va_start(pa, format);
-	_putchar(-1);
-	while (format[0])
+	va_start(valist, format);
+	total = &totalBuffer;
+	for (i = 0; i < BUFSIZE; i++)
+		buffer[i] = 0;
+	for (i = 0; format && format[i]; i++)
 	{
-		if (format[0] == '%')
+		if (format[i] == '%')
 		{
-			structype = driver(format);
-			if (structype)
-			{
-				q[0] = '%';
-				q[1] = format[1];
-				written += structype(q, pa);
-			}
-			else if (format[1] != '\0')
-			{
-				written += _putchar('%');
-				written += _putchar(format[1]);
-			}
-			else
-			{
-				written += _putchar('%');
-				break;
-			}
-			format += 2;
+			i++;
+			spec_func = get_spec_func(format[i]);
+			holder = (spec_func) ? spec_func(valist) : nothing_found(format[i]);
+			if (holder)
+				buffend = alloc_buffer(holder, _strlen(holder), buffer, buffend, total);
 		}
 		else
 		{
-			written += _putchar(format[0]);
-			format++;
+			holder = chartos(format[i]);
+			buffend = alloc_buffer(holder, 1, buffer, buffend, total);
 		}
 	}
-	_putchar(-2);
-	return (written);
+	_puts(buffer, buffend);
+	va_end(valist);
+	return (totalBuffer + buffend);
 }
