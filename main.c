@@ -1,11 +1,11 @@
 #include <limits.h>
 #include <stdio.h>
-#include "holberton.h"
+#include "main.h"
 
 /**
  * main - Entry point
  *
- *Always Return: 0
+ * Return: Always 0
  */
 int main(void)
 {
